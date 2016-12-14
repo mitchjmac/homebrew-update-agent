@@ -11,9 +11,9 @@
 		<string>~/bin/homebrew_update</string>
 	</array>
 	<key>StandardErrorPath</key>
-	<string>/tmp/com.github.brew_update.err</string>
+	<string>/tmp/com.github.homebrew_update.err</string>
 	<key>StandardOutPath</key>
-	<string>/tmp/com.github.brew_update.out</string>
+	<string>/tmp/com.github.homebrew_update.out</string>
 	<key>StartCalendarInterval</key>
 	<dict>
 		<key>Hour</key>

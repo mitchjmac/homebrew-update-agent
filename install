@@ -1,9 +1,12 @@
 #!/bin/bash
 
-# set default values for installation
+set -ue
+
+# set variables
 plist_location="$HOME/Library/LaunchAgents"
 script_location="$HOME/bin"
 run_time=2
+OPTIND=1
 
 # display install help
 print_help () {
@@ -22,33 +25,42 @@ print_help () {
 }
 
 # parse arguments
-OPTIND=1
 while getopts "h?p:s:t:" opt; do
 	case "$opt" in
 	h|\?)
 		print_help
 		exit 0
 		;;
-	p)  plist_location="$OPTARG"
+	p)  plist_location="${OPTARG%/}"
 		;;
-	s)  script_location="$OPTARG"
+	s)  script_location="${OPTARG%/}"
 		;;
 	t)  run_time="$OPTARG"
 		;;
 	esac
 done
-if [ -z "$1" ]
-then
-   print_help
-   exit 0
+
+# argument check
+mkdir -p "$script_location"
+if ! [ "$plist_location" == "/System/Library/LaunchAgents" ] && \
+   ! [ "$plist_location" == "/Library/LaunchAgents" ] && \
+   ! [ "$plist_location" == "$HOME/Library/LaunchAgents" ]; then
+	exit 1
+fi
+if [ "$run_time" -lt 0 ] || [ "$run_time" -gt 23 ]; then
+	exit 1
 fi
 
-# install files
+# create script
+cat ./homebrew_update > "$script_location/homebrew_update"
+chmod +x "$script_location/homebrew_update"
+
+# create plist
 cat ./com.github.homebrew_update_agent.plist > "$plist_location/com.github.homebrew_update_agent.plist"
+defaults write "$plist_location/com.github.homebrew_update_agent" ProgramArguments "('bash', '-c', $script_location/homebrew_update)"
+defaults write "$plist_location/com.github.homebrew_update_agent" StartCalendarInterval -dict Hour "$run_time" Minute 0
 
-defaults write "$plist_location/com.github.homebrew_update_agent" SomeKey -string "somevalue"
+# launch LaunchAgent
 
-
-
-
+set +ue
 
