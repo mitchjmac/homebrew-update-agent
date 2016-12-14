@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Updates, upgrades, and and cleans homebrew
+
+brew_path=($(command -v brew))
+
+"$brew_path" cleanup
+"$brew_path" update
+"$brew_path" upgrade
+"$brew_path" cleanup
+
+"$brew_path" cask cleanup
+casks=($("$brew_path" cask list))
+for cask in ${casks[@]}
+do
+	current=$("$brew_path" cask info $cask | sed -n "s/$cask:\ \(.*\)/\1/p")
+	if [ -z $(find "/usr/local/Caskroom/$cask" -type d -maxdepth 1 -maxdepth 1 -name "$current") ];
+	then
+		"$brew_path" cask uninstall $cask --force
+		"$brew_path" cask install $cask --force
+	fi
+done
+"$brew_path" cask cleanup

@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# set default values for installation
+plist_location="$HOME/Library/LaunchAgents"
+script_location="$HOME/bin"
+run_time=2
+
+# display install help
+print_help () {
+	echo -e 'brew-update-agent: (install)'
+	echo -e ' Creates a LaunchAgent plist and a bash script used to update homebrew daily'
+	echo -e ' IMPORTANT NOTE: If the LaunchAgent is not installed in ~/Library/LaunchAgents\n then run as: sudo ./install'
+	echo ' Flags:'
+	echo -e '\t-p: launchagent plist directory \t(default: ~/Library/LaunchAgents)'
+	echo -e '\t    ./install -p </path/to/directory>'
+	echo -e '\t    {/System/Library/LaunchAgents, /Library/LaunchAgents, ~/Library/LaunchAgents}'
+	echo -e '\t-s: brew update script directory\t(default: ~/bin)'
+	echo -e '\t    ./install -s </path/to/directory>'
+	echo -e '\t-t: time to preform the update everyday\t(default: 2:00am)'
+	echo -e '\t    ./install -t <hour>'
+	echo -e '\t    hour{0-23}'
+}
+
+# parse arguments
+OPTIND=1
+while getopts "h?p:s:t:" opt; do
+	case "$opt" in
+	h|\?)
+		print_help
+		exit 0
+		;;
+	p)  plist_location="$OPTARG"
+		;;
+	s)  script_location="$OPTARG"
+		;;
+	t)  run_time="$OPTARG"
+		;;
+	esac
+done
+if [ -z "$1" ]
+then
+   print_help
+   exit 0
+fi
+
+# install files
+cat ./com.github.homebrew_update_agent.plist > "$plist_location/com.github.homebrew_update_agent.plist"
+
+defaults write "$plist_location/com.github.homebrew_update_agent" SomeKey -string "somevalue"
+
+
+
+
+
