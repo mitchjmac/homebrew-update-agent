@@ -5,6 +5,7 @@ set -ue
 # set variables
 plist_location="$HOME/Library/LaunchAgents"
 script_location="$HOME/bin"
+brew_location="/usr/local/bin/brew"
 run_time=2
 OPTIND=1
 
@@ -41,7 +42,6 @@ while getopts "h?p:s:t:" opt; do
 done
 
 # argument check
-mkdir -p "$script_location"
 if ! [ "$plist_location" == "/System/Library/LaunchAgents" ] && \
    ! [ "$plist_location" == "/Library/LaunchAgents" ] && \
    ! [ "$plist_location" == "$HOME/Library/LaunchAgents" ]; then
@@ -52,15 +52,20 @@ if [ "$run_time" -lt 0 ] || [ "$run_time" -gt 23 ]; then
 fi
 
 # create script
+mkdir -p "$script_location"
 cat ./homebrew_update > "$script_location/homebrew_update"
+if ! [ "$(which brew)" == "$brew_location" ]; then
+	sed -ie 's|'"$brew_location"'|'"$(which brew)"'|g' "$script_location/homebrew_update"
+	rm -f "$script_location/homebrew_updatee"
+fi
 chmod +x "$script_location/homebrew_update"
 
 # create plist
 cat ./com.github.homebrew_update_agent.plist > "$plist_location/com.github.homebrew_update_agent.plist"
 defaults write "$plist_location/com.github.homebrew_update_agent" ProgramArguments "('bash', '-c', $script_location/homebrew_update)"
-defaults write "$plist_location/com.github.homebrew_update_agent" StartCalendarInterval -dict Hour "$run_time" Minute 0
+defaults write "$plist_location/com.github.homebrew_update_agent" StartCalendarInterval -dict Hour -int "$run_time" Minute -int 0
 
-# launch LaunchAgent
+# load LaunchAgent
+launchctl load "$plist_location/com.github.homebrew_update_agent.plist"
 
 set +ue
-
