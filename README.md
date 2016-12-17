@@ -24,7 +24,9 @@ The former indicates the agent is installed and the script ran correctly; the la
 `./install -p </path/to/directory>`  
 \-s: brew update script directory *(default: ~/bin)*  
 `./install -s </path/to/directory>`  
-\-t: integer time to preform the update every day *(default: 2:00am)* `./install -t <hour>`: hour[0-23]
+\-t: integer time to preform the update every day *(default: 2:00am)* `./install -t <hour>`: hour[0-23]  
+\-u: uninstall the launch agent (deletes files and unloads agent)  
+`./install -u`
 
 
 ## Notes

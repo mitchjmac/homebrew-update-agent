@@ -12,10 +12,10 @@ OPTIND=1
 # display install help
 print_help () {
 	echo -e 'brew-update-agent: (install)'
-	echo -e ' Creates a LaunchAgent plist and a bash script used to update homebrew daily'
-	echo -e ' IMPORTANT NOTE: If the LaunchAgent is not installed in ~/Library/LaunchAgents\n then run as: sudo ./install'
+	echo -e ' Creates a Launch Agent plist and a bash script used to update homebrew daily'
+	echo -e ' IMPORTANT NOTE: If the Launch Agent is not installed in ~/Library/LaunchAgents\n then run as: sudo ./install'
 	echo ' Flags:'
-	echo -e '\t-p: launchagent plist directory \t(default: ~/Library/LaunchAgents)'
+	echo -e '\t-p: launch agent plist directory \t(default: ~/Library/LaunchAgents)'
 	echo -e '\t    ./install -p </path/to/directory>'
 	echo -e '\t    {/System/Library/LaunchAgents, /Library/LaunchAgents, ~/Library/LaunchAgents}'
 	echo -e '\t-s: brew update script directory\t(default: ~/bin)'
@@ -23,10 +23,32 @@ print_help () {
 	echo -e '\t-t: time to preform the update everyday\t(default: 2:00am)'
 	echo -e '\t    ./install -t <hour>'
 	echo -e '\t    hour{0-23}'
+	echo -e '\t-u: uninstall the launch agent\t\t(deletes files and unloads agent)'
+	echo -e '\t    ./install -u'
+}
+
+uninstall () {
+	if [ -f "$HOME/Library/LaunchAgents/com.github.homebrew_update_agent.plist" ]; then
+		plist_location="$HOME/Library/LaunchAgents"
+	elif [ -f "/System/Library/LaunchAgents/com.github.homebrew_update_agent.plist" ]; then
+		plist_location ="/System/Library/LaunchAgents"
+	elif [ -f "/Library/LaunchAgents/com.github.homebrew_update_agent.plist" ]; then
+		plist_location ="/Library/LaunchAgents"
+	else
+		echo "uninstall failed: homebrew_update_agent.plist could not be found"
+		exit 1
+	fi
+	script_location="$(defaults read ~/Library/LaunchAgents/com.github.homebrew_update_agent.plist ProgramArguments | grep homebrew_update | sed 's/^ *//g')"
+	script_location="${script_location%\"}"
+	script_location="${script_location#\"}"
+	echo "$script_location"
+	launchctl unload com.github.homebrew_update_agent.plist
+	rm -f "$plist_location/com.github.homebrew_update_agent.plist"
+	rm -f "$script_location"
 }
 
 # parse arguments
-while getopts "h?p:s:t:" opt; do
+while getopts "h?p:s:t:u" opt; do
 	case "$opt" in
 	h|\?)
 		print_help
@@ -37,6 +59,9 @@ while getopts "h?p:s:t:" opt; do
 	s)  script_location="${OPTARG%/}"
 		;;
 	t)  run_time="$OPTARG"
+		;;
+	u)  uninstall
+		exit 0
 		;;
 	esac
 done
@@ -65,7 +90,8 @@ cat ./com.github.homebrew_update_agent.plist > "$plist_location/com.github.homeb
 defaults write "$plist_location/com.github.homebrew_update_agent" ProgramArguments "('bash', '-c', $script_location/homebrew_update)"
 defaults write "$plist_location/com.github.homebrew_update_agent" StartCalendarInterval -dict Hour -int "$run_time" Minute -int 0
 
-# load LaunchAgent
+# load and start Launch Agent
 launchctl load "$plist_location/com.github.homebrew_update_agent.plist"
+launchctl start com.github.homebrew_update_agent
 
 set +ue
