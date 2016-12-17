@@ -41,7 +41,6 @@ uninstall () {
 	script_location="$(defaults read ~/Library/LaunchAgents/com.github.homebrew_update_agent.plist ProgramArguments | grep homebrew_update | sed 's/^ *//g')"
 	script_location="${script_location%\"}"
 	script_location="${script_location#\"}"
-	echo "$script_location"
 	launchctl unload com.github.homebrew_update_agent.plist
 	rm -f "$plist_location/com.github.homebrew_update_agent.plist"
 	rm -f "$script_location"
