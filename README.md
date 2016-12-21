@@ -10,7 +10,7 @@ Check out [this](http://www.grivet-tools.com/blog/2014/launchdaemons-vs-launchag
 `cd /path/to/clone/homebrew-update-agent`
 3. Make the installer executable, in case it's not already  
 `chmod +x ./install`
-4. Run the installer with the desired options, see flags below
+4. Run the installer with the desired options, see flags below  
 `./install -p /path/to/plist -s /path/to/script -t time`
 5. Test to see if the agent is running  
 `launchctl list | grep com.github.homebrew_update_agent`  
