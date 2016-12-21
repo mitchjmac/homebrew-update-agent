@@ -1,5 +1,6 @@
 # homebrew-update-agent
-Installs a macOS Launch Agent and a simple bash script to update Homebrew formulas daily. 
+Installs a macOS Launch Agent and a simple bash script to update Homebrew formula daily.  
+Check out [this](http://www.grivet-tools.com/blog/2014/launchdaemons-vs-launchagents/) great blog post to learn more about launch agents.  
 
 ## Installation
 1. Clone or download the repository  
@@ -33,7 +34,7 @@ The former indicates the agent is installed and the script ran correctly; the la
 ### Install Script
 - install
 - Bash script which installs the plist, the update script, and loads/starts the agent.
-- Props to [this stack exchage forum](http://stackoverflow.com/questions/31968664/upgrade-all-the-casks-installed-via-homebrew-cask) for help updating brew casks
+- Props to [this](http://stackoverflow.com/questions/31968664/upgrade-all-the-casks-installed-via-homebrew-cask) stack exchage forum for help updating brew casks
 
 ### Launch Agent
 - com.github.homebrew_update_agent.plist
